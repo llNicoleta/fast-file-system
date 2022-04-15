@@ -1,23 +1,10 @@
-from typing import Optional
+from event_model import Event
+from response_model import Response, BaseResponse
 
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel, validator
 
 app = FastAPI()
-
-
-class ItemModel(BaseModel):
-    name: str
-    description: str
-    price: int
-    image: Optional[str]
-
-    @validator('price')
-    def price_not_zero(cls, price):
-        if price == 0:
-            raise ValueError("Price shouldn't be zero")
-        return price
 
 
 @app.get("/")
@@ -25,9 +12,11 @@ async def root():
     return {'title': 'Fast File System'}
 
 
-@app.post("/scan-file")
-async def add_item(item: ItemModel) -> ItemModel:
-    return item
+@app.post("/events", response_model=Response)
+async def add_event(event: Event) -> Response:
+    # TODO: check for hash in db before returning risk_level
+    return Response(file=BaseResponse(hash=event.file.file_hash, risk_level=-1),
+                    process=BaseResponse(hash=event.last_access.hash, risk_level=-1))
 
 
 if __name__ == '__main__':
