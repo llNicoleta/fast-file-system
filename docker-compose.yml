@@ -2,12 +2,18 @@ version: '3.7'
 
 services:
   events_api:
+    environment:
+      - MONGO_URL=mongodb://db:27017
+      - REDIS_URL=redis://redis:6379
     build:
       context: .
       dockerfile: ./events_api/Dockerfile
     ports:
       - "8000:8000"
   files_api:
+    environment:
+      - MONGO_URL=mongodb://db:27017
+      - REDIS_URL=redis://redis:6379
     build:
       context: .
       dockerfile: ./files_api/Dockerfile
@@ -18,5 +24,14 @@ services:
     ports:
       - "27017:27017"
     container_name: db
+    hostname: db
     volumes: 
       - ./mongo_data:/data/db
+  redis:
+    image: 'bitnami/redis:latest'
+    ports:
+      - "6379:6379"
+    hostname: redis
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
