@@ -6,8 +6,6 @@ from redis import Redis
 
 
 app = FastAPI()
-db = TestDatabase()
-redis = Redis()
 
 
 @app.post("/scan-file")
@@ -17,6 +15,8 @@ async def add_file(file: UploadFile):
                 'https://beta.nimbus.bitdefender.net:443/liga-ac-labs-cloud/blackbox-scanner/',
                 data={'file': await file.read()}) as resp:
             res = await resp.json()
+            db = TestDatabase()
+            redis = Redis()
             await redis.insert(res['hash'], res['risk_level'], 600)
             await db.insert_data(res)
             return res

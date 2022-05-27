@@ -10,6 +10,8 @@ services:
       dockerfile: ./events_api/Dockerfile
     ports:
       - "8000:8000"
+    hostname: events_api
+    container_name: events_api
   files_api:
     environment:
       - MONGO_URL=mongodb://db:27017
@@ -19,6 +21,8 @@ services:
       dockerfile: ./files_api/Dockerfile
     ports:
       - "8001:8001"
+    hostname: files_api
+    container_name: files_api
   db:
     image: mongo:latest
     ports:
@@ -35,3 +39,17 @@ services:
     container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    container_name: prometheus
+    volumes:
+      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    container_name: grafana
+    volumes:
+      - ./grafana_data:/var/lib/grafana
